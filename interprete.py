@@ -7,6 +7,7 @@ reserved={
     'menos' : 'RE',
     "por" : "MUL",
     "entre" : "DIV",
+    "igual" : "EQUAL",
     "y" : "AND",
     "o" : "OR",
     "no" : "NOT",
@@ -19,7 +20,7 @@ reserved={
     "de" : "FROM",
     "a" : "TO",
     "hasta" : "UNTIL",
-    'es' : "ASIGN",
+    "es" : "ASIGN",
     "\(" : "LPAREN",
     "\)" : "RPAREN",
     "-" : "UMINUS",
@@ -38,6 +39,7 @@ t_SU = r'mas'
 t_RE = r'menos'
 t_MUL = r'por'
 t_DIV = r'entre'
+t_EQUAL = r'igual'
 t_AND = r'y'
 t_OR = r'o'
 t_NOT = r'no'
@@ -77,6 +79,7 @@ def t_error(t):
 
 precedence = (( 'left', 'SU', 'RE' ),
                 ( 'left', 'MUL', 'DIV' ),
+                ( 'left', 'EQUAL' ),
                 ( 'left', 'AND', 'OR' ),
                 ( 'right', 'NOT' ),
                 ( 'right', 'UMINUS' ),
@@ -98,9 +101,6 @@ def p_resultado(t):
     'resultado : s'
     print(t[1])
 
-def p_asignacion(t):
-    'resultado : ID ASIGN s'
-    variables[t[1]] = t[3]
 
 def p_expr_num(t):
     's : N'
@@ -131,6 +131,10 @@ def p_expr_op(t):
             raise ZeroDivisionError("Division by zero")
         t[0] = t[1] / t[3]
 
+def p_expr_equal(t):
+    's : s EQUAL s'
+    t[0] = t[1] == t[3]
+
 def p_expr_and(t):
     's : s AND s'
     t[0] = t[1] and t[3]
@@ -149,7 +153,10 @@ def p_expr_uminus(t):
 
 def p_expr_if(t):
     's : IF s THEN s ELSE s'
-    t[0] = t[2] if t[1] else t[4]
+    if t[1]:
+        t[0] = t[4]
+    else:
+        t[0] = t[6]
 
 def p_expr_while(t):
     's : WHILE s DO s'
@@ -170,6 +177,7 @@ def p_expr_until(t):
 def p_expr_asign(t):
     's : ID ASIGN s'
     variables[t[1]] = t[3]
+    print(t[1], "=", t[3])
 
 def p_expr_expr(t):
     's : LPAREN s RPAREN'
@@ -256,15 +264,42 @@ def p_draw_heart(t):
 lexer = lex.lex()
 parser = yacc.yacc()
 
-# res = parser.parse("cuadrado(5)")
-# res = parser.parse("triangulo(5)")
-# res = parser.parse("rombo(5)")
-# res = parser.parse("corazon(5)")
+print()
+print("Test: Operations")
+res = parser.parse("1 mas 2 por 3")
+res = parser.parse("1 mas 2 por  3 menos 4")
+res = parser.parse("1 mas 2 por 3 menos 4 entre 5")
+
+print()
+print("Test: Logic")
+res = parser.parse("1 y 2")
+res = parser.parse("1 o 0")
+
+# print()
+# print("Test: If")
+# res = parser.parse("x es (1 igual 1)")
+# res = parser.parse("si (x) entonces cuadrado(5) sino cuadrado(10)")
+# print()
+# print("Test: While")
+# res = parser.parse("mientras 2 hacer 3")
+# print()
+# print("Test: For")
+# res = parser.parse("1 para ID de 1 a 2 hacer 3")
+# print()
+# print("Test: Until")
+# res = parser.parse("1 hasta 2 hacer 3")
+
+print()
+print("Test: Draw")
+res = parser.parse("cuadrado(5)")
+res = parser.parse("triangulo(5)")
+res = parser.parse("rombo(5)")
+res = parser.parse("corazon(5)")
 
 
-while True:
-    try:
-        data = input()
-    except EOFError:
-        break
-    parser.parse(data)
+# while True:
+#     try:
+#         data = input()
+#     except EOFError:
+#         break
+#     parser.parse(data)
