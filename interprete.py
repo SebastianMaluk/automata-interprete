@@ -1,4 +1,3 @@
-from lib2to3.pgen2 import token
 import ply.lex as lex
 import ply.yacc as yacc
 
@@ -23,8 +22,11 @@ reserved={
     'es' : "ASIGN",
     "\(" : "LPAREN",
     "\)" : "RPAREN",
-    "-" : "UMINUS"
-
+    "-" : "UMINUS",
+    "cuadrado" : "SQUARE",
+    "triangulo" : "TRIANGLE",
+    "rombo" : "RHOMBUS",
+    "corazon" : "HEART"
 }
 
 tokens = [
@@ -52,7 +54,10 @@ t_ASIGN = r'es'
 t_LPAREN = r'\('
 t_RPAREN = r'\)'
 t_UMINUS = r'-'
-
+t_SQUARE = r'cuadrado'
+t_TRIANGLE = r'triangulo'
+t_RHOMBUS = r'rombo'
+t_HEART = r'corazon'
 t_ignore = ' \t'
 
 
@@ -186,6 +191,80 @@ def p_error(t):
     print("Syntax error at '%s'" % t.value)
 
 
+# Draw square with asterisks
+def p_draw_square(t):
+    's : SQUARE LPAREN N RPAREN'
+    for i in range(t[3]):
+        for j in range(t[3]):
+            print("* ", end="")
+        print()
+    t[0] = "END"
+
+# Draw pyramid with asterisks
+def p_draw_triangle(t):
+    's : TRIANGLE LPAREN N RPAREN'
+    for i in range(t[3]):
+        for j in range(t[3]):
+            if j < t[3] - i - 1:
+                print(" ", end="")
+            else:
+                print("* ", end="")
+        print()
+    t[0] = "END"
+
+# Draw rhombus with asterisks
+def p_draw_rhombus(t):
+    's : RHOMBUS LPAREN N RPAREN'
+    for x in range(1, (t[3]+5) //2 + 1):
+        for y in range( (t[3]+5) //2 - x):
+            print("  ", end = "")
+        for z in range( (x*2)-1 ):
+            print(" *", end = "")
+        print()
+
+    for x in range( (t[3]+5)// 2 + 1, t[3] + 5):
+        for y in range(x - (t[3]+5) //2):
+            print("  ", end = "")
+        for z in range( (t[3]+5 - x) *2 - 1):
+            print(" *", end = "")
+        print()
+    t[0] = "END"
+
+# Draw heart with asterisks
+def p_draw_heart(t):
+    's : HEART LPAREN N RPAREN'
+    for i in range (t[3]):
+        for j in range (t[3]-i-1):
+            print(" ", end="")
+        for j in range (i+1):
+            print("* ", end="")
+        for j in range (2* (t[3]-i-1)):
+            print(" ",end ="")
+        for j in range (i+1):
+            print("* ", end="")
+        print()
+
+    for i in range(2*t[3],0, -1):
+        for j in range (2*t[3]-i):
+            print(" ",end="")
+        for j in range (i,0, -1):
+            print("* ",end="")
+        print()
+    t[0] = "END"
+
+
 lexer = lex.lex()
 parser = yacc.yacc()
-res = parser.parse("2 menos 3")
+
+# res = parser.parse("cuadrado(5)")
+# res = parser.parse("triangulo(5)")
+# res = parser.parse("rombo(5)")
+# res = parser.parse("corazon(5)")
+
+
+while True:
+    try:
+        data = input()
+    except EOFError:
+        break
+    parser.parse(data)
