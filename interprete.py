@@ -275,6 +275,11 @@ print("Test: Logic")
 res = parser.parse("1 y 2")
 res = parser.parse("1 o 0")
 
+print()
+print("Test: Equal")
+res = parser.parse("1 igual 1")
+res = parser.parse("1 igual 2")
+
 # print()
 # print("Test: If")
 # res = parser.parse("x es (1 igual 1)")
